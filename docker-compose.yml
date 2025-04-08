@@ -1,0 +1,33 @@
+services:
+  
+  Postgres:
+    image: ${POSTGRES_IMAGE}
+    container_name: postgreSql
+    restart: always
+    environment:
+      - POSTGRES_USER=${POSTGRES_USER}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+      - POSTGRES_DB=${POSTGRES_DB}
+    ports:
+      - ${POSTGRES_PORTS}:5432
+    volumes:
+      - PostgreSQLSistema:/var/lib/postgresql/data
+  
+  PgAdmin:
+    image: ${PG_ADMIN_IMAGE}
+    container_name: PgAdmin
+    restart: always
+    depends_on:
+      - Postgres
+    environment:
+      - PGADMIN_DEFAULT_EMAIL=${PGADMIN_DEFAULT_EMAIL}
+      - PGADMIN_DEFAULT_PASSWORD=${PGADMIN_DEFAULT_PASSWORD}
+    ports:
+      - ${PGADMIN_PORTS}:80
+    volumes:
+      - PgAdminSistema:/var/lib/pgadmin
+      
+
+volumes:
+  PgAdminSistema:
+  PostgreSQLSistema:

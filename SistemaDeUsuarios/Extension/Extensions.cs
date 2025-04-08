@@ -18,7 +18,7 @@ public static class Extensions
         
         services.AddDbContext<SistemaDeUsuarioContext>(x =>
         {
-            x.UseSqlServer(configuration.GetConnectionString("IdentityConnection"));
+            x.UseNpgsql(configuration.GetConnectionString("IdentityConnection"));
         });
         
         services.AddIdentity<Users, IdentityRole>()
@@ -29,25 +29,25 @@ public static class Extensions
         services.Configure<JwtSettings>(configuration.GetSection("JwtSettings"));
         
         services.AddAuthentication(options =>
-            {
-                options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
-                options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
-
-            }).AddJwtBearer(options =>
-            {
-                options.RequireHttpsMetadata = false;
-                options.SaveToken = false;
-                options.TokenValidationParameters = new TokenValidationParameters
-                {
-                    ValidateIssuerSigningKey = true,
-                    ValidateIssuer = true,
-                    ValidateAudience = true,
-                    ValidateLifetime = true,
-                    ClockSkew = TimeSpan.Zero,
-                    ValidIssuer = configuration["JwtSettings:Issuer"],
-                    ValidAudience = configuration["JwtSettings:Audience"],
-                    IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(configuration["JwtSettings:Key"]))
-                };
+                              {
+                                  options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+                                  options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+                  
+                              }).AddJwtBearer(options =>
+                              {
+                                  options.RequireHttpsMetadata = false;
+                                  options.SaveToken = false;
+                                  options.TokenValidationParameters = new TokenValidationParameters
+                                  {
+                                      ValidateIssuerSigningKey = true,
+                                      ValidateIssuer = true,
+                                      ValidateAudience = true,
+                                      ValidateLifetime = true,
+                                      ClockSkew = TimeSpan.Zero,
+                                      ValidIssuer = configuration["JwtSettings:Issuer"],
+                                      ValidAudience = configuration["JwtSettings:Audience"],
+                                      IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(configuration["JwtSettings:Key"]))
+                                  };
                 options.Events = new JwtBearerEvents()
                 {
                     OnAuthenticationFailed = c =>
@@ -63,14 +63,14 @@ public static class Extensions
                         c.HandleResponse();
                         c.Response.StatusCode = 401;
                         c.Response.ContentType = "application/json";
-                        var result = JsonConvert.SerializeObject(new JwtResponse { HasError = true, Error = "You aren't Authorized" });
+                        var result = JsonConvert.SerializeObject(new JwtResponse { HasError = true, Error = "No estas autorizado" });
                         return c.Response.WriteAsync(result);
                     },
                     OnForbidden = c =>
                     {
                         c.Response.StatusCode = 403;
                         c.Response.ContentType = "application/json";
-                        var result = JsonConvert.SerializeObject(new JwtResponse { HasError = true, Error = "You aren't Authorized to access to this content" });
+                        var result = JsonConvert.SerializeObject(new JwtResponse { HasError = true, Error = "No estas autorizado a este recurso" });
                         return c.Response.WriteAsync(result);
                     }
                 };

@@ -7,6 +7,7 @@ using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using SistemaDeUsuarios.DTOs;
 using SistemaDeUsuarios.Enum;
+using SistemaDeUsuarios.Interfaces;
 using SistemaDeUsuarios.JWT;
 using SistemaDeUsuarios.Models;
 using SistemaDeUsuarios.Settings;
@@ -18,7 +19,7 @@ public class ServicioDeCuenta(
     UserManager<Users> userManager, 
     RoleManager<IdentityRole> roleManager,
     SignInManager<Users> signInManager,
-    IOptions<JwtSettings> jwtSettings)
+    IOptions<JwtSettings> jwtSettings) : IServicioDeCuentas
 {
      private JwtSettings _JwtSettings {get;} = jwtSettings.Value;
      
@@ -28,13 +29,13 @@ public class ServicioDeCuenta(
          var username = await userManager.FindByNameAsync(request.Username);
          if (username != null)
          {
-             return ApiResponse<RegisterResponse>.ErrorResponse($"this user {request.Username} is already taken");
+             return ApiResponse<RegisterResponse>.ErrorResponse($"Este username {request.Username} esta tomado");
          }
 
          var userWithEmail = await userManager.FindByEmailAsync(request.Email);
          if (userWithEmail != null)
          {
-             return ApiResponse<RegisterResponse>.ErrorResponse($"this email {request.Email} is already taken");
+             return ApiResponse<RegisterResponse>.ErrorResponse($"Este email {request.Email} ya esta tomado");
          }
 
          Users user = new()
@@ -43,6 +44,7 @@ public class ServicioDeCuenta(
              LastName = request.LastName,
              UserName = request.Username,
              Email = request.Email,
+             EmailConfirmed = true,
              PhoneNumber = request.PhoneNumber,
          };
 
@@ -56,7 +58,7 @@ public class ServicioDeCuenta(
              await userManager.AddToRoleAsync(user, roles.ToString());
          }else
          {
-             return ApiResponse<RegisterResponse>.ErrorResponse($"An error occurred trying to register the user");
+             return ApiResponse<RegisterResponse>.ErrorResponse($"A ocurrido un error al intentar Registrar al usuario {request.Username}");
          }
          return ApiResponse<RegisterResponse>.SuccessResponse(response);
      }
