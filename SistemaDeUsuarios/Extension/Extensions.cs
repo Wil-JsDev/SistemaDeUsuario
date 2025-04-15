@@ -13,9 +13,16 @@ namespace SistemaDeUsuarios.Extension;
 
 public static class Extensions
 {
+    public static void AddDbContext(this IServiceCollection services, IConfiguration configuration)
+    {
+        services.AddDbContext<SistemaDbContext>(x =>
+        {
+            x.UseNpgsql(configuration.GetConnectionString("SistemaUsuario"));
+        });
+    }
     public static void AddIdentityMethod(this IServiceCollection services, IConfiguration configuration)
     {
-        
+
         services.AddDbContext<SistemaDeUsuarioContext>(x =>
         {
             x.UseNpgsql(configuration.GetConnectionString("IdentityConnection"));

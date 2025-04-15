@@ -1,7 +1,9 @@
 using Microsoft.AspNetCore.Identity;
 using SistemaDeUsuarios.Extension;
 using SistemaDeUsuarios.Interfaces;
+using SistemaDeUsuarios.Interfaces.Repository;
 using SistemaDeUsuarios.Models;
+using SistemaDeUsuarios.Repository;
 using SistemaDeUsuarios.Seeds;
 using SistemaDeUsuarios.Services;
 
@@ -14,7 +16,14 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 builder.Services.AddIdentityMethod(config);
+builder.Services.AddDbContext(config);
+
 builder.Services.AddScoped<IServicioDeCuentas, ServicioDeCuenta>();
+builder.Services.AddScoped<ITareasServicios, TareasServicios>();
+builder.Services.AddScoped<IFolderServicio, FolderServicios>();
+builder.Services.AddScoped(typeof(IGenericRepository<>), typeof(GenericRepository<>));
+builder.Services.AddScoped<IFolderRepository, FolderRepository>();
+builder.Services.AddScoped<ITareasRepository, TareasRepository>();
 
 var app = builder.Build();
 
